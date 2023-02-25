@@ -1,5 +1,6 @@
+from django.db.models import Count
 from django.http import Http404
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Profile
@@ -21,7 +22,21 @@ from drf_api.permissions import IsOwnerOrReadOnly
 
 class ProfileList(generics.ListAPIView):
     serializer_class = ProfileSerializer
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.annotate(
+        posts_count=Count('owner__post', distinct=True),
+        followers_count=Count('owner__followed', distinct=True),
+        following_count=Count('owner__following', distinct=True)
+    ).order_by('-created_at')
+    filter_backends = [
+        filters.OrderingFilter
+    ]
+    ordering_fields = [
+        'posts_count',
+        'followers_count',
+        'following_count',
+        'owner__following__created_at',
+        'owner__followed__created_at'
+    ]
 
 
 # class ProfileDetail(APIView):
@@ -55,4 +70,8 @@ class ProfileList(generics.ListAPIView):
 class ProfileDetail(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsOwnerOrReadOnly]
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.annotate(
+        posts_count=Count('owner__post', distinct=True),
+        followers_count=Count('owner__followed', distinct=True),
+        following_count=Count('owner__following', distinct=True)
+    ).order_by('-created_at')
