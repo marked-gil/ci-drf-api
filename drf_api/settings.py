@@ -63,7 +63,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = 'DEV' in os.environ
 
-ALLOWED_HOSTS = ['localhost', 'https://dj-rest-framework-api.herokuapp.com']
+ALLOWED_HOSTS = ['dj-rest-framework-api.herokuapp.com', 'localhost']
 
 
 # Application definition
